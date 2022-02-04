@@ -1,0 +1,13 @@
+extends layout 
+
+block content 
+  h1.p-3= title
+
+  .p-3.border.bg-light
+    ul
+      each category in category_list 
+        li 
+          a(href=category.url) #{category.name}
+
+      else 
+        p There are no categories.

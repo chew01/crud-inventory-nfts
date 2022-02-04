@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  .p-3
+    h1 NFT Inventory - Index Page
+    p Welcome to the NFT Inventory home page!
+
+  .p-3
+    h2 Statistics
+
+    if error
+      p Error getting statistics.
+    else 
+      p The inventory has the following records: 
+      ul 
+        li #[strong Products in stock:] #{results.products_in_stock}
+        li #[strong Products out of stock:] #{results.products_out_of_stock}
+        li #[strong Total number of products:] #{results.products}
+
+        li #[strong Number of categories:] #{results.categories}
+        li #[strong Total stock:] #{results.stock[0].totalStock}

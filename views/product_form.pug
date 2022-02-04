@@ -1,0 +1,31 @@
+extends layout 
+
+block content 
+    h1.p-3= title
+
+    .p-3
+        form(action="", method="post") 
+            .mb-3 
+                label.form-label(for="nameInput") Name 
+                input#nameInput.form-control(type="text", name="name", required, value=(product==undefined ? '' : product.name)) 
+            .mb-3 
+                label.form-label(for="descriptionInput") Description
+                input#descriptionInput.form-control(type="text", name="description", value=(product==undefined ? '' : product.description)) 
+            .mb-3 
+                label.form-label(for="categoryInput") Category
+                select#categoryInput.form-select(name="category")
+                  for category in categories 
+                    option(value=category._id) #{category.name}
+            .mb-3 
+                label.form-label(for="priceInput") Price
+                input#priceInput.form-control(type="number", name="price", value=(product==undefined ? '' : product.price)) 
+            .mb-3 
+                label.form-label(for="stockInput") Stock
+                input#stockInput.form-control(type="number", name="stock", value=(product==undefined ? '' : product.description)) 
+
+            button.btn.btn-primary(type="submit") Submit
+
+        if errors
+            ul 
+                for error in errors 
+                    li= error.msg
