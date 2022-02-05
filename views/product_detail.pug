@@ -1,0 +1,20 @@
+extends layout 
+
+block content 
+  h1.p-3 Product: #{product.name}
+
+  .p-3.border.bg-light
+    h5 Description 
+    p= product.description || 'No description was added.'
+    h5 Category
+    p
+      a(href=product.category.url) #{product.category.name}
+    p #[strong Price:] #{product.price} dollars
+    p #[strong Stock:] #{product.stock}
+
+
+  .pt-3
+    p
+      a.btn.btn-primary(href=product.url + "/update") Update product
+    p
+      a.btn.btn-primary(href=product.url + "/delete") Delete product

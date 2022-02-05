@@ -9,7 +9,7 @@ var ProductSchema = new Schema({
   stock: { type: Number, required: true },
 });
 
-ProductSchema.virtual('url').get(() => {
+ProductSchema.virtual('url').get(function () {
   return '/catalog/products/' + this._id;
 });
 

@@ -4,17 +4,17 @@ block content
   h1.p-3 Category: #{category.name}
 
   .p-3.border.bg-light
-      h5 Description 
-      p= category.description || 'No description was added.'
-      h5 Products
+    h5 Description 
+    p= category.description || 'No description was added.'
+    h5 Products
 
-      if (category_products.length > 0)
-        ul 
-          for product in category_products
-            li
-              a(href=product.url) #{product.name}
-      else 
-        p There are no products in this category.
+    if (category_products.length > 0)
+      ul 
+        for product in category_products
+          li
+            a(href=product.url) #{product.name}
+    else 
+      p There are no products in this category.
 
   .pt-3
     p
