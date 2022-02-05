@@ -104,12 +104,27 @@ exports.product_create_post = [
   },
 ];
 
-exports.product_delete_get = (req, res) => {
-  res.send('NOT IMPLEMENTED: Product delete get');
+exports.product_delete_get = (req, res, next) => {
+  Product.findById(req.params.id).exec((err, result) => {
+    if (err) return next(err);
+    if (result == null) {
+      res.redirect('/catalog/products');
+    }
+    res.render('product_delete', { product: result });
+  });
 };
 
-exports.product_delete_post = (req, res) => {
-  res.send('NOT IMPLEMENTED: Product delete post');
+exports.product_delete_post = (req, res, next) => {
+  Product.findById(req.params.id).exec((err, result) => {
+    if (err) return next(err);
+    if (result == null) {
+      res.redirect('/catalog/products');
+    }
+    Product.findByIdAndRemove(req.params.id, (err) => {
+      if (err) return next(err);
+      res.redirect('/catalog/products');
+    });
+  });
 };
 
 exports.product_update_get = (req, res, next) => {
