@@ -1,6 +1,7 @@
 var Product = require('../models/product');
 var Category = require('../models/category');
 const { body, validationResult } = require('express-validator');
+var async = require('async');
 
 exports.product_list = (req, res, next) => {
   Product.find()
@@ -75,7 +76,6 @@ exports.product_create_post = [
     });
 
     if (!errors.isEmpty()) {
-      console.log(errors);
       Category.find()
         .sort()
         .exec((err, result) => {
@@ -112,10 +112,89 @@ exports.product_delete_post = (req, res) => {
   res.send('NOT IMPLEMENTED: Product delete post');
 };
 
-exports.product_update_get = (req, res) => {
-  res.send('NOT IMPLEMENTED: Product update get');
+exports.product_update_get = (req, res, next) => {
+  async.parallel(
+    {
+      product: (callback) => {
+        Product.findById(req.params.id).exec(callback);
+      },
+      categories: (callback) => {
+        Category.find().sort().exec(callback);
+      },
+    },
+    (err, result) => {
+      if (err) return next(err);
+      if (result.product == null) {
+        var err = new Error('Product not found');
+        err.status = 404;
+        return next(err);
+      }
+      res.render('product_form', {
+        title: 'Update product',
+        product: result.product,
+        categories: result.categories,
+      });
+    }
+  );
 };
 
-exports.product_update_post = (req, res) => {
-  res.send('NOT IMPLEMENTED: Product update post');
-};
+exports.product_update_post = [
+  // validation
+  body('name', 'Product name required').trim().isLength({ min: 1 }).escape(),
+  body('description').escape(),
+  body('category', 'Category must be selected')
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body('price')
+    .trim()
+    .isInt({ min: 0 })
+    .withMessage('Price cannot be negative')
+    .isLength({ min: 1 })
+    .withMessage('Price must be stated')
+    .escape(),
+  body('stock')
+    .trim()
+    .isInt({ min: 0 })
+    .withMessage('Stock cannot be negative')
+    .isLength({ min: 1 })
+    .withMessage('Stock must be stated')
+    .escape(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      Category.find()
+        .sort()
+        .exec((err, result) => {
+          if (err) return next(err);
+          res.render('product_form', {
+            title: 'Update product',
+            categories: result,
+            product: req.body,
+            errors: errors.array(),
+          });
+        });
+      return;
+    } else {
+      var product = new Product({
+        name: req.body.name,
+        description: req.body.description,
+        category: req.body.category,
+        price: req.body.price,
+        stock: req.body.stock,
+        _id: req.params.id,
+      });
+      Product.findByIdAndUpdate(
+        req.params.id,
+        product,
+        {},
+        (err, updated_product) => {
+          if (err) next(err);
+          res.redirect(updated_product.url);
+        }
+      );
+    }
+  },
+];

@@ -1,0 +1,21 @@
+extends layout 
+
+block content 
+  h1.p-3 Delete category: #{category.name}
+
+  .p-3
+    p #[strong Description: ]#{category.description}
+
+    if (category_products.length)
+      p #[strong Delete the following products or reassign them to another category before deleting this category.]
+      ul 
+        for product in category_products 
+          li 
+            a(href=product.url) #{product.name}
+    
+    else 
+      p Do you really want to delete this category?
+        form(action="", method="post") 
+          .form-group 
+            input#categoryId.form-control(type="hidden", name="categoryId", required="true", value=category._id)
+          button.btn.btn-primary(type="submit") Delete

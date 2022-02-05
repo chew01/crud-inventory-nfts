@@ -86,12 +86,55 @@ exports.category_create_post = [
   },
 ];
 
-exports.category_delete_get = (req, res) => {
-  res.send('NOT IMPLEMENTED: Category delete get');
+exports.category_delete_get = (req, res, next) => {
+  async.parallel(
+    {
+      category: (callback) => {
+        Category.findById(req.params.id).exec(callback);
+      },
+      category_products: (callback) => {
+        Product.find({ category: req.params.id }).sort().exec(callback);
+      },
+    },
+    (err, result) => {
+      if (err) return next(err);
+      if (result.category == null) {
+        res.redirect('/catalog/categories');
+      }
+      res.render('category_delete', {
+        category: result.category,
+        category_products: result.category_products,
+      });
+    }
+  );
 };
 
 exports.category_delete_post = (req, res) => {
-  res.send('NOT IMPLEMENTED: Category delete post');
+  async.parallel(
+    {
+      category: (callback) => {
+        Category.findById(req.params.id).exec(callback);
+      },
+      category_products: (callback) => {
+        Product.find({ category: req.params.id }).sort().exec(callback);
+      },
+    },
+    (err, result) => {
+      if (err) return next(err);
+      if (result.category_products.length > 0) {
+        res.render('category_delete', {
+          category: result.category,
+          category_products: result.category_products,
+        });
+        return;
+      } else {
+        Category.findByIdAndRemove(req.params.id, (err) => {
+          if (err) return next(err);
+          res.redirect('/catalog/categories');
+        });
+      }
+    }
+  );
 };
 
 exports.category_update_get = (req, res, next) => {
@@ -109,6 +152,38 @@ exports.category_update_get = (req, res, next) => {
   });
 };
 
-exports.category_update_post = (req, res) => {
-  res.send('NOT IMPLEMENTED: Category update post');
-};
+exports.category_update_post = [
+  // validate and sanitize
+  body('name', 'Category name required').trim().isLength({ min: 1 }).escape(),
+  body('description').escape(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      // error exists, render form again with errors
+      res.render('category_form', {
+        title: 'Update category',
+        category: req.body,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // form is valid
+      var category = new Category({
+        name: req.body.name,
+        description: req.body.description,
+        _id: req.params.id,
+      });
+      Category.findByIdAndUpdate(
+        req.params.id,
+        category,
+        {},
+        (err, updated_category) => {
+          if (err) return next(err);
+          res.redirect(updated_category.url);
+        }
+      );
+    }
+  },
+];

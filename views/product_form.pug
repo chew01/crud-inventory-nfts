@@ -15,7 +15,10 @@ block content
                 label.form-label(for="categoryInput") Category
                 select#categoryInput.form-select(name="category")
                   for category in categories 
-                    option(value=category._id, selected=(category._id.toString()===product.category._id.toString() ? 'selected' : false)) #{category.name}
+                    if product
+                        option(value=category._id, selected=(category._id.toString()===product.category._id.toString() ? 'selected' : false)) #{category.name}
+                    else 
+                        option(value=category._id) #{category.name}
             .mb-3 
                 label.form-label(for="priceInput") Price
                 input#priceInput.form-control(type="number", name="price", step="1", required, value=(product==undefined ? '' : product.price)) 
