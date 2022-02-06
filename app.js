@@ -1,3 +1,4 @@
+require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -12,8 +13,7 @@ var app = express();
 
 // mongodb setup
 var mongoose = require('mongoose');
-var mongoDB =
-  'mongodb+srv://kitsuoka:RiCgo1j618KddjM7@cluster0.8p0yp.mongodb.net/nft_inventory?retryWrites=true&w=majority';
+var mongoDB = process.env.MONGO_KEY;
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error'));
